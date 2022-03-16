@@ -1,0 +1,29 @@
+image:
+  name: python:3.9.10
+  entrypoint:
+    - '/usr/bin/env'
+    - 'PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
+
+variables:
+  ANSIBLE_BECOME_PASSWORD: ${ANSIBLE_BECOME_PASSWORD}
+  RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
+
+before_script:
+  - pip3 install -r requirements.txt
+
+stages:
+  - redis
+
+#all:
+#  stage: rabbitmq
+#  script:
+#    - pip3 install -r requirements.txt
+#  when: manual
+
+
+config_redis:
+  stage: redis
+  script:
+     - ANSIBLE_CONFIG=ansible.cfg ansible-playbook -i inventory/hosts.ini playbook.yml -e ansible_become_password=${ANSIBLE_BECOME_PASSWORD} -e ansible_password=${ANSIBLE_BECOME_PASSWORD} -b
+    #  - ANSIBLE_CONFIG=ansible.cfg ansible -i inventory/hosts.ini all -m ping -e 
+  when: manual
